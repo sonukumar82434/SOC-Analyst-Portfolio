@@ -1,0 +1,23 @@
+title: Windows Failed Logon Event 4625
+id: 5a9d4f2a-4625-4c0d-9f91-8f9d6f5d1a21
+status: experimental
+description: Detects Windows Security Event ID 4625 failed logon events.
+references:
+    - https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625
+author: Sonu Kumar
+date: 2026-08-16
+tags:
+    - attack.credential-access
+    - attack.t1110.001
+logsource:
+    product: windows
+    service: security
+detection:
+    selection:
+        EventID: 4625
+    condition: selection
+falsepositives:
+    - Incorrect passwords
+    - Expired or cached credentials
+    - Misconfigured services or scheduled tasks
+level: low

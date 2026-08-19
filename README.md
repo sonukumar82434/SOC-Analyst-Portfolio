@@ -42,20 +42,21 @@ The detection searches Windows Security events for Event ID 4625, extracts the s
 index=main sourcetype="XmlWinEventLog:Security" host="Hacker" "<EventID>4625</EventID>"
 | rex field=_raw "<Data Name='TargetUserName'>(?<target_user>[^<]+)"
 | rex field=_raw "<Data Name='IpAddress'>(?<src_ip>[^<]+)"
-| stats count as failed_attempts by src_ip target_user
+| bin _time span=1m
+| stats count as failed_attempts by _time src_ip target_user
 | where failed_attempts >= 3
 | eval severity=case(
     failed_attempts >= 10,"High",
     failed_attempts >= 5,"Medium",
     failed_attempts >= 3,"Low"
 )
-| table src_ip target_user failed_attempts severity
+| table _time src_ip target_user failed_attempts severity
 | sort - failed_attempts
 ```
 
 ## Alert Configuration
 
-**Alert:** Password Spray Detection - Windows 4625
+**Alert:** Repeated Windows Failed Authentication Detection — Event ID 4625
 
 **Type:** Scheduled
 
@@ -162,8 +163,12 @@ SOC-Analyst-Portfolio/
 ├── attack/
 │   └── Password-Spray.md
 ├── detections/
-│   └── splunk/
-│       └── Password-Spray-Detection.spl
+│   ├── sigma/
+│   │   └── Windows-4625-Failed-Logon.yml
+│   ├── splunk/
+│   │   └── Password-Spray-Detection.spl
+│   └── wazuh/
+│       └── windows-4625-failed-logon.xml
 ├── lab/
 │   ├── Kali-Setup.md
 │   ├── Networking.md

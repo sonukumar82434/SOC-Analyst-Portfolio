@@ -22,7 +22,7 @@ Because only one username was targeted and the source was localhost (`127.0.0.1`
 
 ## Detection Details
 
-**Detection Name:** Password Spray Detection - Windows 4625
+**Detection Name:** Repeated Windows Failed Authentication Detection — Event ID 4625
 
 **Platform:** Splunk Enterprise 10.4.2
 
@@ -48,14 +48,15 @@ The alert successfully generated trigger history during testing.
 index=main sourcetype="XmlWinEventLog:Security" host="Hacker" "<EventID>4625</EventID>"
 | rex field=_raw "<Data Name='TargetUserName'>(?<target_user>[^<]+)"
 | rex field=_raw "<Data Name='IpAddress'>(?<src_ip>[^<]+)"
-| stats count as failed_attempts by src_ip target_user
+| bin _time span=1m
+| stats count as failed_attempts by _time src_ip target_user
 | where failed_attempts >= 3
 | eval severity=case(
     failed_attempts >= 10,"High",
     failed_attempts >= 5,"Medium",
     failed_attempts >= 3,"Low"
 )
-| table src_ip target_user failed_attempts severity
+| table _time src_ip target_user failed_attempts severity
 | sort - failed_attempts
 ```
 

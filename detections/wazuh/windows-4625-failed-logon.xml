@@ -2,8 +2,5 @@
   <rule id="1004625" level="5">
     <field name="win.system.eventID">4625</field>
     <description>Windows failed logon detected - Event ID 4625</description>
-    <mitre>
-      <id>T1110.001</id>
-    </mitre>
   </rule>
 </group>
